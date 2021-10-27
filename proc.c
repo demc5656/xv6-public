@@ -366,17 +366,19 @@ crsp(void)
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
-
-  acquire(&ptable.lock);
-  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->state == RUNNABLE) {
-        cprintf("process [%s:%d] is running\n",p->name, p->pid);
-      }
-      if(p->state == SLEEPING) {
-        cprintf("process [%s:%d] is sleeping\n",p->name, p->pid);
-      }
+  for(;;){
+    sti();
+    acquire(&ptable.lock);
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->state == RUNNABLE) {
+          cprintf("process [%s:%d] is running\n",p->name, p->pid);
+        }
+        if(p->state == SLEEPING) {
+          cprintf("process [%s:%d] is sleeping\n",p->name, p->pid);
+        }
+    }
+    release(&ptable.lock);
   }
-  release(&ptable.lock);
   return 0;
 }
 
