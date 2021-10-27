@@ -367,7 +367,7 @@ crsp(void)
   struct cpu *c = mycpu();
   c->proc = 0;
   for(;;){
-    sti();
+    //sti();
     acquire(&ptable.lock);
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
         if(p->state == RUNNABLE) {
