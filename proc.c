@@ -336,7 +336,7 @@ scheduler(void)
       if(p->state != RUNNABLE)
         continue;
       //cprintf("process [%s:%d] is running\n",p->name, p->pid);
-      // TODO: UNCOMMENT ^
+      // TODO: UNCOMMENT FOR PROJECT^
       
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
@@ -360,7 +360,7 @@ scheduler(void)
 // Current, Running, and Sleeping Processes
 // Added for 361 project.
 // Found in proc.c
-int csrp(void) {
+int crsp(void) {
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
@@ -375,6 +375,7 @@ int csrp(void) {
       }
   }
   release(&ptable.lock);
+  return 0;
 }
 
 
