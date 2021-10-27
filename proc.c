@@ -335,7 +335,9 @@ scheduler(void)
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
-
+      //cprintf("process [%s:%d] is running\n",p->name, p->pid);
+      // TODO: UNCOMMENT FOR PROJECT^
+      
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
@@ -354,6 +356,28 @@ scheduler(void)
 
   }
 }
+
+// Current, Running, and Sleeping Processes
+// Added for 361 project.
+// Found in proc.c
+int crsp(void) {
+  struct proc *p;
+  struct cpu *c = mycpu();
+  c->proc = 0;
+
+  acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->state == RUNNABLE) {
+        cprintf("process [%s:%d] is running\n",p->name, p->pid);
+      }
+      if(p->state == SLEEPING) {
+        cprintf("process [%s:%d] is sleeping\n",p->name, p->pid);
+      }
+  }
+  release(&ptable.lock);
+  return 0;
+}
+
 
 // Enter scheduler.  Must hold only ptable.lock
 // and have changed proc->state. Saves and restores
