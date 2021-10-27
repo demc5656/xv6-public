@@ -360,7 +360,9 @@ scheduler(void)
 // Current, Running, and Sleeping Processes
 // Added for 361 project.
 // Found in proc.c
-int crsp(void) {
+int
+crsp(void)
+{
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
