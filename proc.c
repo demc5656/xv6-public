@@ -78,9 +78,13 @@ allocproc(void)
 
   acquire(&ptable.lock);
 
-  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-    if(p->state == UNUSED)
-      goto found;
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+	  p->queueNumber=3;
+	  p->remainingIterations=8;
+	  p->idleCount=0;
+    	  if(p->state == UNUSED)
+          	goto found;
+  }
 
   release(&ptable.lock);
   return 0;
@@ -333,9 +337,14 @@ scheduler(void)
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+	    for( f=ptable.proc; f< &ptable.proc[NPROC]; f++){
+		    if(idleCount>remainingIterations && idleCount==0){
+
       if(p->state != RUNNABLE)
         continue;
-
+      cprintf("process [%s:%d] is running. Queue Number[%d], Idle Count[%d0ms], Iterations Left[%d]\n",p->name, p->pid, p->queueNumber, p->idleCount, p->remainingIterations);
+      // TODO: UNCOMMENT FOR PROJECT^
+      
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
@@ -351,9 +360,32 @@ scheduler(void)
       c->proc = 0;
     }
     release(&ptable.lock);
-
   }
 }
+
+// Current, Running, and Sleeping Processes
+// Added for 361 project.
+// Found in proc.c
+int crsp(void) {
+	struct proc *p;
+	//struct cpu *c = mycpu();
+	//c->proc =0;
+
+	acquire(&ptable.lock);
+	for(p=ptable.proc; p < &ptable.proc[NPROC]; p++){
+	    if(p->state == RUNNING){
+	    	cprintf("%s\t%d\tRUNNING\n",p->name, p->pid);
+	    }
+  	    else if(p->state == SLEEPING) {
+      	       	cprintf("%s\t%d\tSLEEPING\n",p->name, p->pid);
+	    }
+	    
+	}
+	release (&ptable.lock);
+  	return 0;
+}
+
+
 
 // Enter scheduler.  Must hold only ptable.lock
 // and have changed proc->state. Saves and restores

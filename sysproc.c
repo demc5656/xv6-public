@@ -89,3 +89,15 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+int
+sys_crsp(void)
+{
+  return crsp();
+}
+
+int
+sys_getyear(void)
+{
+	return 1975;
+}
