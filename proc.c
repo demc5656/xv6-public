@@ -336,94 +336,97 @@ scheduler(void)
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-      if(p->state != RUNNABLE)
-        continue;
-      else{
-              for(struct proc *i = ptable.proc; i < &ptable.proc[NPROC]; i++){
-                      if(p->state!=RUNNABLE){
-                         continue;
-                      }
-                      if(i->remainingIterations==0){
-                                if(i->queueNumber==3){
-                                        i->queueNumber=i->queueNumber-1;
-                                        i->idleCount=0; //Yes, I know I can move these outside of the if statements.
-                                        i->remainingIterations=16;
-                                }
-                                else if(i->queueNumber==2){
-                                        i->queueNumber=i->queueNumber-1;
-                                        i->idleCount=0;
-                                        i->remainingIterations=24;
-                                }
-                                else if(i->queueNumber==1){
-                                        i->queueNumber=i->queueNumber-1;
-                                        i->idleCount=0;
-                                        i->remainingIterations=50;
-                                }
-                                else if(i->queueNumber==0){
-                                        i->idleCount=0;
-                                        i->remainingIterations=50;
-                                }
-                                else{
-                                        cprintf(" HUH Should never ever reach this");
-                                        continue;
-                                }
-                      }
-                      else if(i->idleCount>i->remainingIterations && i->remainingIterations!=0){
-                                if(i->queueNumber==3){
-                                        i->idleCount=0; //Yes, I know I can move these outside of the if statements.
-                                        //i->remainingIterations=8;
-                                }
-                                else if(i->queueNumber==2){
-                                        i->queueNumber=i->queueNumber+1;
-                                        i->idleCount=0;
-                                        i->remainingIterations=8;
-                                }
-                                else if(i->queueNumber==1){
-                                        i->queueNumber=i->queueNumber+1;
-                                        i->idleCount=0;
-                                        i->remainingIterations=16;
-                                }
-                                else if(i->queueNumber==0){
-                                        i->queueNumber=i->queueNumber+1;
-                                        i->idleCount=0;
-                                        i->remainingIterations=24;
-                                }
-                                else{
-                                        cprintf("Should never ever reach this, %d :", i->queueNumber);
-                                        continue;
-                                }
-                      }
-		      if(i->queueNumber>p->queueNumber){
-                              p->idleCount=p->idleCount+1;
-                              p=i;
-                      }
-                      if(i->queueNumber<=p->queueNumber){
-                              i->idleCount+=1;
-                      }
-              }
+    if(p->state != RUNNABLE)
+      continue;
+    else{
+      for(struct proc *i = ptable.proc; i < &ptable.proc[NPROC]; i++){
+        if(p->state!=RUNNABLE){
+          continue;
+        }
+        if(i->remainingIterations==0){
+          if(i->queueNumber==3){
+            i->queueNumber=i->queueNumber-1;
+            i->idleCount=0; //Yes, I know I can move these outside of the if statements.
+            i->remainingIterations=16;
+          }
+          else if(i->queueNumber==2){
+            i->queueNumber=i->queueNumber-1;
+            i->idleCount=0;
+            i->remainingIterations=24;
+          }
+          else if(i->queueNumber==1){
+            i->queueNumber=i->queueNumber-1;
+            i->idleCount=0;
+            i->remainingIterations=50;
+          }
+          else if(i->queueNumber==0){
+            i->idleCount=0;
+            i->remainingIterations=50;
+          }
+          else{
+            cprintf(" HUH Should never ever reach this");
+            continue;
+          }
+        }
+        else if(i->idleCount>i->remainingIterations && i->remainingIterations!=0){
+          if(i->queueNumber==3){
+            i->idleCount=0; //Yes, I know I can move these outside of the if statements.
+            //i->remainingIterations=8;
+          }
+          else if(i->queueNumber==2){
+            i->queueNumber=i->queueNumber+1;
+            i->idleCount=0;
+            i->remainingIterations=8;
+          }
+          else if(i->queueNumber==1){
+            i->queueNumber=i->queueNumber+1;
+            i->idleCount=0;
+            i->remainingIterations=16;
+          }
+          else if(i->queueNumber==0){
+            i->queueNumber=i->queueNumber+1;
+            i->idleCount=0;
+            i->remainingIterations=24;
+          }
+          else{
+            cprintf("Should never ever reach this, %d :", i->queueNumber);
+            continue;
+          }
+        }
+        if(i->queueNumber>p->queueNumber){
+          p->idleCount=p->idleCount+1;
+          p=i;
+        }
+        if(i->queueNumber<=p->queueNumber){
+          i->idleCount+=1;
+        }
+        if (p->state==RUNNING) {
+          p->idleCount = 0;
+        }
       }
-      cprintf("process [%s:%d] is running. Queue Number[%d], Idle Count[%d0ms], Iterations Left[%d]\n",p->name, p->pid, p->queueNumber, p->idleCount, p->remainingIterations);
-      // TODO: UNCOMMENT FOR PROJECT^
-      
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
-      c->proc = p;
-      p->remainingIterations=p->remainingIterations-1;
-	  
-      switchuvm(p);
-      p->state = RUNNING;
-
-      swtch(&(c->scheduler), p->context);
-      switchkvm();
-
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
-      c->proc = 0;
     }
-    release(&ptable.lock);
+    cprintf("process [%s:%d] is running. Queue Number[%d], Idle Count[%d0ms], Iterations Left[%d]\n",p->name, p->pid, p->queueNumber, p->idleCount, p->remainingIterations);
+    // TODO: UNCOMMENT FOR PROJECT^
+    
+    // Switch to chosen process.  It is the process's job
+    // to release ptable.lock and then reacquire it
+    // before jumping back to us.
+    c->proc = p;
+    p->remainingIterations=p->remainingIterations-1;
+  
+    switchuvm(p);
+    p->state = RUNNING;
+
+    swtch(&(c->scheduler), p->context);
+    switchkvm();
+
+    // Process is done running for now.
+    // It should have changed its p->state before coming back.
+    c->proc = 0;
   }
+  release(&ptable.lock);
 }
+
 
 // Current, Running, and Sleeping Processes
 // Added for 361 project.
