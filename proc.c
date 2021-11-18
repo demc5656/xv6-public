@@ -400,11 +400,12 @@ scheduler(void)
         if(i->queueNumber<=p->queueNumber){
           i->idleCount+=1;
         }
-        if (p->state==RUNNING) {
+        /*if (p->state==RUNNING) {
           p->idleCount = 0;
-        }
+        }*/
       }
     }
+    p->idleCount = 0;
     cprintf("process [%s:%d] is running. Queue Number[%d], Idle Count[%d0ms], Iterations Left[%d]\n",p->name, p->pid, p->queueNumber, p->idleCount, p->remainingIterations);
     // TODO: UNCOMMENT FOR PROJECT^
     
