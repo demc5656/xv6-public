@@ -329,7 +329,7 @@ scheduler(void)
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
-  
+  //TODO: Make efficient?
   for(;;){
     // Enable interrupts on this processor.
     sti();
