@@ -336,73 +336,75 @@ scheduler(void)
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-    if(p->state != RUNNABLE)
-      continue;
-    else{
-      for(struct proc *i = ptable.proc; i < &ptable.proc[NPROC]; i++){
-        if(p->state!=RUNNABLE){
-          continue;
-        }
-        if(i->remainingIterations==0){
-          if(i->queueNumber==3){
-            i->queueNumber=i->queueNumber-1;
-            i->idleCount=0; //Yes, I know I can move these outside of the if statements.
-            i->remainingIterations=16;
-          }
-          else if(i->queueNumber==2){
-            i->queueNumber=i->queueNumber-1;
-            i->idleCount=0;
-            i->remainingIterations=24;
-          }
-          else if(i->queueNumber==1){
-            i->queueNumber=i->queueNumber-1;
-            i->idleCount=0;
-            i->remainingIterations=50;
-          }
-          else if(i->queueNumber==0){
-            i->idleCount=0;
-            i->remainingIterations=50;
-          }
-          else{
-            cprintf(" HUH Should never ever reach this");
+    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      if(p->state != RUNNABLE)
+        continue;
+      else{
+        for(struct proc *i = ptable.proc; i < &ptable.proc[NPROC]; i++){
+          if(p->state!=RUNNABLE){
             continue;
           }
+          if(i->remainingIterations==0){
+            if(i->queueNumber==3){
+              i->queueNumber=i->queueNumber-1;
+              i->idleCount=0; //Yes, I know I can move these outside of the if statements.
+              i->remainingIterations=16;
+            }
+            else if(i->queueNumber==2){
+              i->queueNumber=i->queueNumber-1;
+              i->idleCount=0;
+              i->remainingIterations=24;
+            }
+            else if(i->queueNumber==1){
+              i->queueNumber=i->queueNumber-1;
+              i->idleCount=0;
+              i->remainingIterations=50;
+            }
+            else if(i->queueNumber==0){
+              i->idleCount=0;
+              i->remainingIterations=50;
+            }
+            else{
+              cprintf(" HUH Should never ever reach this");
+              continue;
+            }
+          }
+          else if(i->idleCount>i->remainingIterations && i->remainingIterations!=0){
+            if(i->queueNumber==3){
+              i->idleCount=0; //Yes, I know I can move these outside of the if statements.
+              //i->remainingIterations=8;
+            }
+            else if(i->queueNumber==2){
+              i->queueNumber=i->queueNumber+1;
+              i->idleCount=0;
+              i->remainingIterations=8;
+            }
+            else if(i->queueNumber==1){
+              i->queueNumber=i->queueNumber+1;
+              i->idleCount=0;
+              i->remainingIterations=16;
+            }
+            else if(i->queueNumber==0){
+              i->queueNumber=i->queueNumber+1;
+              i->idleCount=0;
+              i->remainingIterations=24;
+            }
+            else{
+              cprintf("Should never ever reach this, %d :", i->queueNumber);
+              continue;
+            }
+          }
+          if(i->queueNumber>p->queueNumber){
+            p->idleCount=p->idleCount+1;
+            p=i;
+          }
+          if(i->queueNumber<=p->queueNumber){
+            i->idleCount+=1;
+          }
+          /*if (p->state==RUNNING) {
+            p->idleCount = 0;
+          }*/
         }
-        else if(i->idleCount>i->remainingIterations && i->remainingIterations!=0){
-          if(i->queueNumber==3){
-            i->idleCount=0; //Yes, I know I can move these outside of the if statements.
-            //i->remainingIterations=8;
-          }
-          else if(i->queueNumber==2){
-            i->queueNumber=i->queueNumber+1;
-            i->idleCount=0;
-            i->remainingIterations=8;
-          }
-          else if(i->queueNumber==1){
-            i->queueNumber=i->queueNumber+1;
-            i->idleCount=0;
-            i->remainingIterations=16;
-          }
-          else if(i->queueNumber==0){
-            i->queueNumber=i->queueNumber+1;
-            i->idleCount=0;
-            i->remainingIterations=24;
-          }
-          else{
-            cprintf("Should never ever reach this, %d :", i->queueNumber);
-            continue;
-          }
-        }
-        if(i->queueNumber>p->queueNumber){
-          p->idleCount=p->idleCount+1;
-          p=i;
-        }
-        if(i->queueNumber<=p->queueNumber){
-          i->idleCount+=1;
-        }
-        /*if (p->state==RUNNING) {
-          p->idleCount = 0;
-        }*/
       }
     }
     p->idleCount = 0;
