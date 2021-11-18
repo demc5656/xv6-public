@@ -55,6 +55,26 @@ struct proc {
   int idleCount;               // Iterations since last process was run
 };
 
+//int *tickTotal = 0;
+struct proc *nextProc;
+//struct proc *top3;
+/*struct proc *top2;
+struct proc *top1;
+struct proc *top0;
+
+struct proc *bottom3;
+struct proc *bottom2;
+struct proc *bottom1;*/
+//struct proc *bottom0;
+int *idleArray = {
+  8, 7, 6, 5, 4, 3, 2, 1, 0, 
+  
+  16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 
+  
+  24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 
+  
+  50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 
+  25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
 // Process memory is laid out contiguously, low addresses first:
 //   text
 //   original data and bss

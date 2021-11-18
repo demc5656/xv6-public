@@ -80,10 +80,12 @@ allocproc(void)
 
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
 	  p->queueNumber=3;
-	  p->remainingIterations=8;
-	  p->idleCount=0;
-    	  if(p->state == UNUSED)
-          	goto found;
+	  //p->remainingIterations=8;
+	  //p->idleCount=0;
+    p->remainingIterations=idleArray[0];
+    p->idleCount=idleArray[8];
+    if(p->state == UNUSED)
+      goto found;
   }
 
   release(&ptable.lock);
@@ -326,7 +328,7 @@ wait(void)
 void
 scheduler(void)
 {
-  struct proc *p;
+  //struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
   //TODO: Make efficient?
@@ -336,7 +338,11 @@ scheduler(void)
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    /*if (tickTotal==0) {
+      nextProc = &ptable.proc[0];
+    }
+    p = nextProc;*/
+    /*for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
       else{
@@ -401,11 +407,11 @@ scheduler(void)
           if(i->queueNumber<=p->queueNumber){
             i->idleCount+=1;
           }
-          /*if (p->state==RUNNING) {
-            p->idleCount = 0;
-          }*/
         }
-      }
+      }*/
+
+
+
     }
     p->idleCount = 0;
     cprintf("process [%s:%d] is running. Queue Number[%d], Idle Count[%d0ms], Iterations Left[%d]\n",p->name, p->pid, p->queueNumber, p->idleCount, p->remainingIterations);
